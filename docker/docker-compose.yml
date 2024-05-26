@@ -1,0 +1,12 @@
+version: '3'
+services:
+  pi:
+    build: .
+    command: echo hey
+    # ports:
+    #   - "80:80"
+    # volumes:
+    #   - ./app:/app
+    # environment:
+    #   - APP_ENV=local
+    #   - APP_KEY=base64:q1J

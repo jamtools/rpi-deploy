@@ -1,0 +1,20 @@
+{
+  "name": "rpi-deploy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js",
+    "dist-pkg": "pkg -t node18-linux,node18-macos-arm64 dist/index.js --out-path dist-pkg",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "esbuild": "0.21.4",
+    "pkg": "^5.8.1",
+    "typescript": "^5.4.5"
+  }
+}

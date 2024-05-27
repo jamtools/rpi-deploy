@@ -4,17 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js",
-    "dist-pkg": "pkg -t node18-linux,node18-macos-arm64 dist/index.js --out-path dist-pkg",
+    "build": "esbuild src/apps/update_checker/index.ts --bundle --outfile=dist/index.js",
+    "dist-pkg": "pkg -t node18-linux-x64,node18-macos-arm64 dist/index.js --out-path docker/dist-pkg",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.12.12",
+    "@yao-pkg/pkg": "^5.11.5",
     "esbuild": "0.21.4",
-    "pkg": "^5.8.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.3",
     "typescript": "^5.4.5"
   }
 }

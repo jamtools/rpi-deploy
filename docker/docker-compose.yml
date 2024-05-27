@@ -1,6 +1,10 @@
 version: '3'
 services:
   pi:
-    build: .
+    build:
+      context: .
+      network: none
     command: ./index
     platform: linux/x86_64
+    # volumes:
+    #   - "./workspace:/workspace"

@@ -3,24 +3,23 @@ import {promisify} from 'util';
 
 const execAsync = promisify(exec);
 
-const DEBUG = false;
+const DEBUG = true;
 
 describe('yeah', () => {
     it('should work', async () => {
-        let out = '';
-        out = (await execAsync('npm run build')).stdout;
-        if (DEBUG) console.log(out);
+        let out = await execAsync('npm run build');
+        if (DEBUG) {console.log(out.stdout); console.log(out.stderr);}
 
-        out = (await execAsync('npm run dist-pkg')).stdout;
-        if (DEBUG) console.log(out);
+        out = await execAsync('npm run dist-pkg');
+        if (DEBUG) {console.log(out.stdout); console.log(out.stderr);}
 
-        out = (await execAsync('docker compose build', {cwd: './docker'})).stdout;
-        if (DEBUG) console.log(out);
+        out = await execAsync('docker compose build', {cwd: './docker'});
+        if (DEBUG) {console.log(out.stdout); console.log(out.stderr);}
 
-        out = (await execAsync('docker compose up', {cwd: './docker'})).stdout;
-        if (DEBUG) console.log(out);
+        out = await execAsync('docker compose up', {cwd: './docker'});
+        if (DEBUG) {console.log(out.stdout); console.log(out.stderr);}
 
-        const lines = getConsoleLinesFromDockerComposeStdOut('pi', out);
+        const lines = getConsoleLinesFromDockerComposeStdOut('pi', out.stdout);
         expect(lines).toEqual(['yup']);
     }, 50000);
 });
@@ -32,3 +31,11 @@ const getConsoleLinesFromDockerComposeStdOut = (containerName: string, stdout: s
 
     return lines.filter(l => l.startsWith(toSearch)).map(l => l.substring(toSearch.length));
 }
+
+// make artifact downloading mock
+// so you can test everything
+// make it so you can compile things from `npm run build-app-for-test (test file name)`
+// and make it so the test itself can populate those source files with strings during the test
+
+// use fullcircle to test latest releases
+// publish the on npm

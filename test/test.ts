@@ -25,11 +25,11 @@ describe('yeah', () => {
 });
 
 const getConsoleLinesFromDockerComposeStdOut = (containerName: string, stdout: string) => {
-    const key = `docker-${containerName}-1`;
+    const key = `${containerName}-1`;
     const toSearch = `${key}  | `;
     const lines = stdout.split('\n');
 
-    return lines.filter(l => l.startsWith(toSearch)).map(l => l.substring(toSearch.length));
+    return lines.filter(l => l.includes(toSearch)).map(l => l.split(toSearch)[1]);
 }
 
 // make artifact downloading mock

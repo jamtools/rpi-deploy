@@ -7,15 +7,6 @@ const pathToRepoConfigFile = 'repo_config.json';
 
 const DEFAULT_INTERVAL = 1000 * 60 * 60; // 1 hour
 
-if ([...process.argv].pop()?.endsWith('update_checker_job.ts')) {
-    setTimeout(() => {
-        const client = new GithubReleaseFetcher();
-        const job = new UpdateCheckerJob(client, './workspace');
-        job.run();
-        // job.start();
-    });
-}
-
 export class UpdateCheckerJob {
     private directory: string;
     private runnerManager: RunnerManager;

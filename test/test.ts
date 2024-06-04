@@ -20,7 +20,11 @@ describe('yeah', () => {
         if (DEBUG) {console.log(out.stdout); console.log(out.stderr);}
 
         const lines = getConsoleLinesFromDockerComposeStdOut('pi', out.stdout);
-        expect(lines).toEqual(['yup']);
+        expect(lines).toEqual([
+            'new release found',
+            'downloading release asset',
+            'yup',
+        ]);
     }, 50000);
 });
 
@@ -29,7 +33,7 @@ const getConsoleLinesFromDockerComposeStdOut = (containerName: string, stdout: s
     const toSearch = `${key}  | `;
     const lines = stdout.split('\n');
 
-    return lines.filter(l => l.includes(toSearch)).map(l => l.split(toSearch)[1]);
+    return lines.filter(l => l.includes(toSearch)).map(l => l.split(toSearch)[1]).filter(Boolean);
 }
 
 // make artifact downloading mock

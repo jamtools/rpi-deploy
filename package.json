@@ -4,12 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild src/apps/update_checker/index.ts --bundle --outfile=dist/index.js",
+    "build": "esbuild src/apps/update_checker/index.ts --bundle --outfile=dist/index.js --platform=node",
     "dist-pkg": "pkg -t node18-linux-x64,node18-macos-arm64 dist/index.js --out-path docker/dist-pkg",
     "test": "jest test",
     "test:ci": "npm test",
     "check-types": "tsc --noEmit"
-
   },
   "keywords": [],
   "author": "",

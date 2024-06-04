@@ -6,5 +6,8 @@ services:
       network: none
     command: ./index
     platform: linux/x86_64
+    environment:
+      WORKSPACE_DIRECTORY: '/workspace'
+      ASSET_NAME: 'index-linux-x64'
     # volumes:
     #   - "./workspace:/workspace"

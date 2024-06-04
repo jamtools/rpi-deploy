@@ -5,8 +5,10 @@ export type ReleaseResponse = RestEndpointMethodTypes['repos']['getLatestRelease
 export class GithubReleaseFetcher {
     client: Octokit;
 
-    constructor() {
-        this.client = new Octokit();
+    constructor(url?: string) {
+        this.client = new Octokit({
+            baseUrl: url,
+        });
     }
 
     getLatestRelease = async (owner: string, repo: string): Promise<ReleaseResponse> => {

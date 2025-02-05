@@ -47,7 +47,7 @@ jobs:
 
         image-name: "rpideploy-${{ github.ref_name }}-${{ matrix.arch }}"
         enable-ssh: 1
-        stage-list: stage0 stage1 stage2
+        stage-list: stage0 stage1 stage2 ./stage-custom
         # stage-list: stage0 stage1 stage2 ./stage-custom
         verbose-output: true
         pi-gen-version: ${{ matrix.pi_gen_version }}

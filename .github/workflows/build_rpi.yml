@@ -1,9 +1,12 @@
-name: Build Custom Raspberry Pi Image
+name: Build Raspberry Pi Image
 
 on:
   push:
     branches:
     - main
+  pull_request:
+  workflow_dispatch:
+
 
 jobs:
   build:

@@ -1,16 +1,14 @@
-name: Build Raspberry Pi Image
+name: Build Custom Raspberry Pi Image
 
 on:
   push:
     branches:
     - main
-  pull_request:
-  workflow_dispatch:
-
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
     - name: Install Node.js
@@ -23,12 +21,15 @@ jobs:
     - name: Build app
       run: npm run build
 
-    - name: Prepare Customization Scripts
+    - name: Set Up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Create Customization Scripts
       run: |
-        mkdir -p customizations/stage-custom
+        mkdir -p stage-custom
 
         # 00-run.sh: Main script to execute customizations
-        cat << 'EOF' > customizations/stage-custom/00-run.sh
+        cat << 'EOF' > stage-custom/00-run.sh
         #!/bin/bash
         set -e
 
@@ -38,11 +39,10 @@ jobs:
         # Set up HTTP server
         /pi-gen/stage-custom/02-http-server
         EOF
-
-        chmod +x customizations/stage-custom/00-run.sh
+        chmod +x stage-custom/00-run.sh
 
         # 01-wifi-config: Configure Wi-Fi credentials
-        cat << 'EOF' > customizations/stage-custom/01-wifi-config
+        cat << 'EOF' > stage-custom/01-wifi-config
         #!/bin/bash
         set -e
         mkdir -p "${ROOTFS_DIR}/etc/wpa_supplicant"
@@ -60,16 +60,15 @@ jobs:
 
         chmod 600 "${ROOTFS_DIR}/etc/wpa_supplicant/wpa_supplicant.conf"
         EOF
-
-        chmod +x customizations/stage-custom/01-wifi-config
+        chmod +x stage-custom/01-wifi-config
 
         # 02-http-server: Set up systemd service for HTTP server
-        cat << 'EOF' > customizations/stage-custom/02-http-server
+        cat << 'EOF' > stage-custom/02-http-server
         #!/bin/bash
         set -e
 
         # Install Python3 using chroot
-        chroot "${ROOTFS_DIR}" bash << CHROOT_EOF
+        on_chroot << CHROOT_EOF
         apt-get update
         apt-get install -y python3
         CHROOT_EOF
@@ -91,7 +90,6 @@ jobs:
             print('Starting server at http://0.0.0.0:8080')
             server.serve_forever()
         SERVER_EOF
-
         chmod +x "${ROOTFS_DIR}/usr/local/bin/simple-http-server.py"
 
         # Create and enable the systemd service
@@ -109,34 +107,25 @@ jobs:
         WantedBy=multi-user.target
         SERVICE_EOF
 
-        chroot "${ROOTFS_DIR}" bash << CHROOT_EOF
+        on_chroot << CHROOT_EOF
         systemctl enable simple-http-server.service
         CHROOT_EOF
         EOF
-
-        chmod +x customizations/stage-custom/02-http-server
+        chmod +x stage-custom/02-http-server
 
         # Create the pi-gen config file
-        cat << CONFIG_EOF > customizations/config
+        cat << CONFIG_EOF > config
         IMG_NAME='CustomPiImage'
         ENABLE_SSH=1
         CONFIG_EOF
 
-    # Set up Docker Buildx (needed for multi-arch builds)
-    - name: Set Up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-
-    # Build the custom Raspberry Pi image using pi-gen
     - name: Build Custom Raspberry Pi Image
       uses: usimd/pi-gen-action@v1
       with:
         image-name: 'CustomPiImage'
         stage-list: 'stage0 stage1 stage2 stage-custom'
-        config: './customizations/config'
-        custom-stages: './customizations/stage-custom'
         export-last-stage-only: true
 
-    # Upload the final image artifact
     - name: Upload Image Artifact
       uses: actions/upload-artifact@v4
       with:

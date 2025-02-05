@@ -138,7 +138,7 @@ jobs:
 
     # Upload the final image artifact
     - name: Upload Image Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: custom-raspberry-pi-image
         path: deploy/CustomPiImage.img

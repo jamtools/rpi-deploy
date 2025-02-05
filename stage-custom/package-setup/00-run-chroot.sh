@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+mkdir -p /proc /dev /sys /run /tmp
+
 # Install required packages
 apt-get update
 apt-get install -y python3

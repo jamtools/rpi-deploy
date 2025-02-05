@@ -58,6 +58,11 @@ jobs:
         verbose-output: true
         pi-gen-version: ${{ matrix.pi_gen_version }}
         pi-gen-repository: RaspAP/pi-gen
+        increase-runner-disk-size: true
+        export-last-stage-only: true
+        hostname: myhostname
+        username: myuser
+        password: mypassword
 
     - name: Upload Artifact
       uses: svenstaro/upload-release-action@v2

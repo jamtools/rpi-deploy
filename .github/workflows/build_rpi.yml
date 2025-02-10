@@ -4,8 +4,7 @@ permissions:
   contents: write
 
 on:
-  release:
-    types: [published]
+  pull_request:
 
 jobs:
   build-raspap-image:

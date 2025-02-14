@@ -69,7 +69,8 @@ jobs:
           stage-list: stage3
           # stage-list: stage3 custom-stage
           work-dir: pi-gen/work
-          continue: true
+        env:
+          CONTINUE: '1'
 
       - name: Upload Final Image Artifact
         uses: actions/upload-artifact@v4

@@ -1,0 +1,18 @@
+name: Watch esbuild output file hash and deploy if changed
+sources:
+  fileHash:
+    kind: shell
+    name: local hash
+    spec:
+      command: curl -s http://localhost:1380/index.js | sha256sum | cut -d' ' -f1
+conditions:
+  hashChanged:
+    kind: shell
+    sourceid: fileHash
+    spec:
+      command: /etc/updatecli/scripts/compare_with_file.sh /etc/updatecli/.last_index_hash
+targets:
+  fetchBinary:
+    kind: shell
+    spec:
+      command: /etc/updatecli/scripts/run_from_esbuild.sh

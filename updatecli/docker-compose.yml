@@ -1,0 +1,47 @@
+services:
+  updatecli:
+    build:
+      context: .
+    # image: updatecli/updatecli:latest
+    # platform: linux/x86_64
+    container_name: updatecli
+    # restart: unless-stopped
+    volumes:
+      # Map the local updatecli configuration into the container (read-only)
+      - ./new_stuff/updatecli.d:/etc/updatecli
+      # - ./new_stuff/updatecli.d/local_file.yml:/etc/updatecli/updatecli.yaml:ro
+      # - ./updatecli.yaml:/etc/updatecli/updatecli.yaml:ro
+      # Map the local app directory so updatecli can read and update your files
+      # - ./app:/app:rw
+      # Map /tmp from the host so temporary files are available
+      - ./tmp:/tmp:rw
+
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw # Let systemd mount cgroups
+      - tmpfs:/run                        # Mount tmpfs at /run
+      - tmpfs:/run/lock
+    # environment:
+    #   # Provide your GitHub token if needed
+    #   GITHUB_TOKEN: ${GITHUB_TOKEN}
+    privileged: true
+    cgroup: host
+    # command: /sbin/init
+    stdin_open: true
+    tty: true
+
+    # command: "ls /etc/updatecli"
+    # command: "updatecli apply --config /etc/updatecli/local_file.yml"
+    # command: "apply --config /etc/updatecli/local_file.yml"
+    # command: "apply --config /etc/updatecli/updatecli.yaml"
+
+    network_mode: "host"
+    # command: "manifest show --config /etc/updatecli/updatecli.yaml --debug"
+    # command: "--help"
+    # command: "apply --help"
+    # command: "apply --config /etc/updatecli/updatecli.yaml --debug"
+
+volumes:
+  tmpfs:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs

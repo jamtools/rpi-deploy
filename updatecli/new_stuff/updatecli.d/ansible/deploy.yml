@@ -1,0 +1,11 @@
+- hosts: localhost
+  connection: local
+  become: true
+  vars:
+    service_name: myapp
+    service_description: "Local Service"
+    artifact_path: "/etc/updatecli/artifacts/{{ artifact_name }}"
+    service_user: root
+    service_group: root
+  roles:
+    - deploy_artifact

@@ -3,7 +3,7 @@ Description=Timer for checking GitHub releases
 
 [Timer]
 OnBootSec=1min
-OnUnitActiveSec=1min
+OnUnitActiveSec=1hour
 
 [Install]
 WantedBy=timers.target

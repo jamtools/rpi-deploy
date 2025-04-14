@@ -2,7 +2,10 @@
 
 set -e
 
-mkdir -p artifacts
-curl -sL -o artifacts/index.js "https://github.com/$1/$2/releases/download/$3/index.js"
+mkdir -p /home/jamtools/code/artifacts
+curl -sL -o /home/jamtools/code/artifacts/dist.zip "https://github.com/$1/$2/releases/download/$3/dist.zip"
 
-/home/jamtools/code/scripts/common/create_and_run_service.sh myapp "/usr/bin/node /home/jamtools/code/artifacts/index.js"
+mkdir -p /home/jamtools/code/artifacts/dist
+unzip -o /home/jamtools/code/artifacts/dist.zip -d /home/jamtools/code/artifacts/dist
+
+/home/jamtools/code/scripts/common/create_and_run_service.sh myapp "/usr/bin/node /home/jamtools/code/artifacts/dist/server/dist/local-server.cjs"

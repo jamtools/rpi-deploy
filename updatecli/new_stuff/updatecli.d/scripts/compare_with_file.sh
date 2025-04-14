@@ -19,7 +19,7 @@ EXISTING_VALUE=$(cat "$COMPARE_FILE")
 
 if [ "$EXISTING_VALUE" = "$SOURCE_VALUE" ]; then
   echo "No change needed. Value matches $COMPARE_FILE."
-  exit 0
+  exit 1
 else
   echo "Value changed. Updating $COMPARE_FILE."
   echo "$SOURCE_VALUE" > "$COMPARE_FILE"

@@ -1,12 +1,15 @@
-name: Pull latest commit on GitHub
+name: Pull latest release on GitHub
 sources:
   newRelease:
     kind: githubrelease
     # name: github version
     spec:
       owner: jamtools
-      repository: github-releases-test
+      repository: songdrive-releases
       token: "{{ requiredEnv `GITHUB_TOKEN` }}"
+      versionfilter:
+        kind: regex
+        pattern: "vjamscribe-.*$"
 
 conditions:
   checkIfCommitIsNew:
@@ -20,4 +23,4 @@ targets:
     kind: shell
     sourceid: newRelease
     spec:
-      command: /home/jamtools/code/scripts/run_from_github_release.sh jamtools github-releases-test
+      command: /home/jamtools/code/scripts/run_from_github_release.sh jamtools songdrive-releases

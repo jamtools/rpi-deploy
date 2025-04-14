@@ -17,6 +17,7 @@ After=network.target
 Type=simple
 ExecStart=$COMMAND
 Restart=on-failure
+WorkingDirectory=/home/jamtools/code/artifacts
 
 [Install]
 WantedBy=multi-user.target"

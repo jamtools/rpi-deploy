@@ -1,0 +1,10 @@
+[Unit]
+Description=Check GitHub releases
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/updatecli apply --config /home/jamtools/code/updatecli_github_commit.yml
+
+[Install]
+WantedBy=multi-user.target

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+# set -euo pipefail
 
 COMPARE_FILE="$1"
 SOURCE_VALUE="${2:-}"

@@ -1,4 +1,7 @@
-curl -sL -o /etc/updatecli/artifacts/index.js http://localhost:1380/index.js
-# chmod +x /etc/updatecli/artifacts/index.js
-python3 -m ansible playbook /etc/updatecli/ansible/deploy.yml -e "artifact_name=index.js"
-# ansible playbook /etc/updatecli/ansible/deploy.yml -e "artifact_name=index.js"
+#!/usr/bin/env bash
+set -e
+
+mkdir -p artifacts
+curl -sL -o /home/jamtools/code/artifacts/index.js http://jam.local:1380/index.js
+
+/home/jamtools/code/scripts/common/create_and_run_service.sh $1 "node /home/jamtools/code/artifacts/index.js"

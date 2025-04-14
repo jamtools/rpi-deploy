@@ -5,13 +5,14 @@ const origin = 'http://jam.local:1380';
 
 setTimeout(async () => {
     run();
-    new EventSource(`${origin}/esbuild`).addEventListener('change', async e => {
+    new EventSource(origin + '/esbuild').addEventListener('change', async e => {
         run();
     });
 });
 
 const run = () => {
-    spawn('updatecli', ['apply', '--config', '/etc/updatecli/local_file.yml'], {
+    spawn('/home/jamtools/code/scripts/run_from_esbuild.sh', ['myapp'], {
+    // spawn('updatecli', ['apply', '--config', '/home/jamtools/code/local_file.yml'], {
         env: {
             PATH: process.env.PATH,
         },

@@ -5,7 +5,7 @@ sources:
     # name: github version
     spec:
       owner: jamtools
-      repository: songdrive-releases
+      repository: jamscribe
       token: "{{ requiredEnv `GITHUB_TOKEN` }}"
       versionfilter:
         kind: regex
@@ -23,4 +23,4 @@ targets:
     kind: shell
     sourceid: newRelease
     spec:
-      command: /home/jamtools/code/scripts/run_from_github_release.sh jamtools songdrive-releases
+      command: /home/jamtools/code/scripts/run_from_github_release.sh jamtools jamscribe

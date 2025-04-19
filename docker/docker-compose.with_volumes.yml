@@ -1,0 +1,10 @@
+version: '3'
+services:
+  pi_with_volumes:
+    build:
+      context: .
+      network: none
+    command: ./index
+    platform: linux/x86_64
+    volumes:
+      - "./workspace:/workspace"

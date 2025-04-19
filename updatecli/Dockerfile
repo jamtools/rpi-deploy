@@ -57,7 +57,9 @@ COPY new_stuff/updatecli.d/scripts/check_esbuild.js .
 
 # # COPY ./dist-pkg/index-linux-x64 ./index
 
-RUN pip3 install ansible
+RUN pip3 install ansible --break-system-packages
+
+RUN apt-get install --allow-downgrades --fix-missing -y cockpit
 
 VOLUME [ "/sys/fs/cgroup" ]
 STOPSIGNAL SIGRTMIN+3

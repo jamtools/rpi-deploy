@@ -11,8 +11,8 @@ setTimeout(async () => {
 });
 
 const run = () => {
-    spawn('/home/jamtools/code/scripts/run_from_esbuild.sh', ['myapp'], {
-    // spawn('updatecli', ['apply', '--config', '/home/jamtools/code/local_file.yml'], {
+    spawn('/home/pi/code/scripts/run_from_esbuild.sh', ['myapp'], {
+    // spawn('updatecli', ['apply', '--config', '/home/pi/code/local_file.yml'], {
         env: {
             PATH: process.env.PATH,
         },

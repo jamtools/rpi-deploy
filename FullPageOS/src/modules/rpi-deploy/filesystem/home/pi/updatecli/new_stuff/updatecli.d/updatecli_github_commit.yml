@@ -16,11 +16,11 @@ conditions:
     kind: shell
     sourceid: newRelease
     spec:
-      command: /home/jamtools/code/scripts/compare_with_file.sh /home/jamtools/code/.last_release_tag
+      command: /home/pi/code/scripts/compare_with_file.sh /home/pi/code/.last_release_tag
 
 targets:
   runFromRelease:
     kind: shell
     sourceid: newRelease
     spec:
-      command: /home/jamtools/code/scripts/run_from_github_release.sh jamtools jamscribe
+      command: /home/pi/code/scripts/run_from_github_release.sh jamtools jamscribe

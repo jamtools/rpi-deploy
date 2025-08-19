@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/updatecli apply --config /home/jamtools/code/updatecli_github_commit.yml
-EnvironmentFile=/home/jamtools/code/secrets.env
+ExecStart=/usr/bin/updatecli apply --config /home/pi/code/updatecli_github_commit.yml
+EnvironmentFile=/home/pi/secrets.env
 
 [Install]
 WantedBy=multi-user.target

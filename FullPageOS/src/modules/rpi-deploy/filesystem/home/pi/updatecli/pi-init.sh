@@ -34,7 +34,7 @@ setTimeout(async () => {
 });
 
 const run = () => {
-    spawn('updatecli', ['apply', '--config', '/home/jamtools/code/local_file.yml'], {
+    spawn('updatecli', ['apply', '--config', '/home/pi/code/local_file.yml'], {
         env: {
             PATH: process.env.PATH,
         },

@@ -1,0 +1,10 @@
+[Unit]
+Description=Check esbuild output file hash and deploy if changed
+After=network.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/node /home/pi/code/scripts/check_esbuild.js
+
+[Install]
+WantedBy=multi-user.target

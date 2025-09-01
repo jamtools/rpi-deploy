@@ -12,7 +12,7 @@ source /common.sh
 unpack /filesystem/home /home
 # unpack /filesystem/opt /opt
 # unpack /filesystem/boot /"${BASE_BOOT_MOUNT_PATH}"
-# unpack /filesystem/root_init /
+unpack /filesystem/root_init /
 
 apt-get update
 
@@ -25,6 +25,15 @@ curl -sL -o /tmp/updatecli_arm64.deb https://github.com/updatecli/updatecli/rele
 
 npm init -y
 npm i eventsource
+
+# Make scripts executable
+chmod +x /home/pi/code/scripts/*.sh
+chmod +x /home/pi/code/scripts/common/*.sh
+
+# Enable systemd services
+systemctl daemon-reload
+systemctl enable check_github_releases.timer
+systemctl enable check_github_releases.service
 
 echo "server time.nist.gov" >> /etc/ntp.conf
 echo "server ntp.ubuntu.com" >> /etc/ntp.conf

@@ -51,7 +51,7 @@ runs:
               map(select(.tagName | startswith($prefix)))
               | sort_by(.publishedAt)
               | last
-              | if . == null then "none" else .tagName end
+              | if . == null then "none" else .tagName[1:] end
             ')
         echo "latest_tag=$latest" >> $GITHUB_OUTPUT
         echo "Found latest release: $latest"

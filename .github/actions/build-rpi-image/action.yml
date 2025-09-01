@@ -177,7 +177,7 @@ runs:
     - name: Set artifact name
       id: artifact
       shell: bash
-      run: echo "name=$(date '+%Y%m%d_%H%M%S')_${{ github.sha }}_${{ inputs.version_prefix }}rpi.img.gz" >> $GITHUB_OUTPUT
+      run: echo "name=$(date '+%Y%m%d_%H%M%S')_${{ github.sha }}_$(echo '${{ inputs.source_repo }}' | tr '/' '_')_rpi.img.gz" >> $GITHUB_OUTPUT
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4

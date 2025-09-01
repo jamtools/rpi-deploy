@@ -15,6 +15,30 @@ inputs:
 runs:
   using: 'composite'
   steps:
+
+    - name: Free up disk space
+      uses: insightsengineering/disk-space-reclaimer@v1
+      with:
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false
+        swap-storage: true
+        docker-images: true
+        tools-cache: false
+
+    - name: Check disk space
+      shell: bash
+      run: df -h
+
+    - name: Update apt
+      shell: bash
+      run: sudo apt-get update
+
+    - name: Install Dependencies
+      shell: bash
+      run: sudo apt install coreutils p7zip-full qemu-user-static python3-git
+
     - name: Find latest matching release by tag prefix
       id: find_release
       shell: bash
@@ -41,29 +65,6 @@ runs:
         file: dist.zip
         out: previous_release.zip
         token: ${{ inputs.github_token }}
-
-    - name: Free up disk space
-      uses: insightsengineering/disk-space-reclaimer@v1
-      with:
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: false
-        swap-storage: true
-        docker-images: true
-        tools-cache: false
-
-    - name: Check disk space
-      shell: bash
-      run: df -h
-
-    - name: Update apt
-      shell: bash
-      run: sudo apt-get update
-
-    - name: Install Dependencies
-      shell: bash
-      run: sudo apt install coreutils p7zip-full qemu-user-static python3-git
 
     - name: Checkout CustomPiOS
       uses: actions/checkout@v2

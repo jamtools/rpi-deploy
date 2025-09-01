@@ -94,6 +94,37 @@ runs:
         mv previous_release.zip repository/src/modules/rpi-deploy/filesystem/home/pi/code/artifacts/dist.zip
         echo "Placed release zip at: repository/src/modules/rpi-deploy/filesystem/home/pi/code/artifacts/dist.zip"
 
+    - name: Parameterize UpdateCLI configuration
+      shell: bash
+      run: |
+        # Extract owner and repository from source_repo input
+        OWNER=$(echo "${{ inputs.source_repo }}" | cut -d'/' -f1)
+        REPOSITORY=$(echo "${{ inputs.source_repo }}" | cut -d'/' -f2)
+        
+        # Create the directory for secrets
+        mkdir -p repository/src/modules/rpi-deploy/filesystem/home/pi/code/
+        
+        # Create secrets.env file with GITHUB_TOKEN
+        echo "GITHUB_TOKEN=${{ inputs.github_token }}" > repository/src/modules/rpi-deploy/filesystem/home/pi/code/secrets.env
+        
+        # Parameterize the updatecli configuration file
+        UPDATECLI_CONFIG="repository/src/modules/rpi-deploy/filesystem/home/pi/updatecli/new_stuff/updatecli.d/updatecli_github_commit.yml"
+        
+        # Replace hardcoded values with parameterized ones
+        sed -i "s/owner: jamtools/owner: $OWNER/g" "$UPDATECLI_CONFIG"
+        sed -i "s/repository: jamscribe/repository: $REPOSITORY/g" "$UPDATECLI_CONFIG" 
+        sed -i "s/pattern: \"vjamscribe-.*\$/pattern: \"${{ inputs.version_prefix }}.*\$/g" "$UPDATECLI_CONFIG"
+        sed -i "s|run_from_github_release.sh jamtools jamscribe|run_from_github_release.sh $OWNER $REPOSITORY|g" "$UPDATECLI_CONFIG"
+        
+        # Copy the updatecli config to where the systemd service expects it
+        cp "$UPDATECLI_CONFIG" "repository/src/modules/rpi-deploy/filesystem/home/pi/code/updatecli_github_commit.yml"
+        
+        echo "Updated UpdateCLI config with:"
+        echo "  Owner: $OWNER"
+        echo "  Repository: $REPOSITORY"  
+        echo "  Version prefix: ${{ inputs.version_prefix }}"
+        echo "  Config copied to: /home/pi/code/updatecli_github_commit.yml"
+
     - name: Download Raspbian Image
       shell: bash
       run: cd repository/src/image && wget -q -c --trust-server-names 'https://downloads.raspberrypi.org/raspios_lite_armhf_latest'

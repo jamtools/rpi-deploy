@@ -3,7 +3,7 @@ name: Build Image
 on: push
 
 jobs:
-  test-action:
+  build-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout releases repo into `.github/composite-actions`

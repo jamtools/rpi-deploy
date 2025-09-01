@@ -23,8 +23,11 @@ curl -sL -o /tmp/updatecli_arm64.deb https://github.com/updatecli/updatecli/rele
     sudo dpkg -i /tmp/updatecli_arm64.deb && \
     rm /tmp/updatecli_arm64.deb
 
+# Install Node.js dependencies in the correct directory
+cd /home/pi/code
 npm init -y
 npm i eventsource
+cd /
 
 # Make scripts executable
 chmod +x /home/pi/code/scripts/*.sh
@@ -37,6 +40,10 @@ systemctl enable check_github_releases.service
 
 echo "server time.nist.gov" >> /etc/ntp.conf
 echo "server ntp.ubuntu.com" >> /etc/ntp.conf
+
+# Optional: Enable esbuild service for local development
+# Uncomment the following line if you want to use local esbuild server instead of GitHub releases
+# systemctl enable check_esbuild.service
 
 #cleanup
 apt-get clean

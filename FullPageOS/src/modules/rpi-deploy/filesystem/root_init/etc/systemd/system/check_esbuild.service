@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Restart=always
 ExecStart=/usr/bin/node /home/pi/code/scripts/check_esbuild.js
+EnvironmentFile=-/home/pi/code/esbuild.env
 
 [Install]
 WantedBy=multi-user.target

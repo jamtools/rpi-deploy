@@ -2,15 +2,22 @@ name: 'Build RPi Image with Release Download'
 description: 'Downloads latest release from a repo and builds a Raspberry Pi image'
 inputs:
   source_repo:
-    description: 'GitHub repository to download release from (e.g., jamtools/jamscribe)'
+    description: 'GitHub repository to download release from (e.g., owner/repo)'
     required: true
   version_prefix:
-    description: 'Version tag prefix to match releases (e.g., vjamscribe-)'
+    description: 'Version tag prefix to match releases (e.g., vapp-)'
     required: true
   github_token:
     description: 'GitHub token for API access'
     required: true
     default: ${{ github.token }}
+  service_name:
+    description: 'Name of the service to create'
+    required: false
+    default: 'myapp'
+  esbuild_server_url:
+    description: 'URL of esbuild development server (enables esbuild mode when provided)'
+    required: false
 
 runs:
   using: 'composite'
@@ -100,30 +107,52 @@ runs:
         # Extract owner and repository from source_repo input
         OWNER=$(echo "${{ inputs.source_repo }}" | cut -d'/' -f1)
         REPOSITORY=$(echo "${{ inputs.source_repo }}" | cut -d'/' -f2)
-        
+
         # Create the directory for secrets
         mkdir -p repository/src/modules/rpi-deploy/filesystem/home/pi/code/
-        
-        # Create secrets.env file with GITHUB_TOKEN
+
+        # Create secrets.env file with GITHUB_TOKEN and SERVICE_NAME
         echo "GITHUB_TOKEN=${{ inputs.github_token }}" > repository/src/modules/rpi-deploy/filesystem/home/pi/code/secrets.env
-        
+        echo "SERVICE_NAME=${{ inputs.service_name }}" >> repository/src/modules/rpi-deploy/filesystem/home/pi/code/secrets.env
+
         # Parameterize the updatecli configuration file
-        UPDATECLI_CONFIG="repository/src/modules/rpi-deploy/filesystem/home/pi/updatecli/new_stuff/updatecli.d/updatecli_github_commit.yml"
-        
-        # Replace hardcoded values with parameterized ones
-        sed -i "s/owner: jamtools/owner: $OWNER/g" "$UPDATECLI_CONFIG"
-        sed -i "s/repository: jamscribe/repository: $REPOSITORY/g" "$UPDATECLI_CONFIG" 
-        sed -i "s/pattern: \"vjamscribe-.*\$/pattern: \"${{ inputs.version_prefix }}.*\$/g" "$UPDATECLI_CONFIG"
-        sed -i "s|run_from_github_release.sh jamtools jamscribe|run_from_github_release.sh $OWNER $REPOSITORY|g" "$UPDATECLI_CONFIG"
-        
-        # Copy the updatecli config to where the systemd service expects it
-        cp "$UPDATECLI_CONFIG" "repository/src/modules/rpi-deploy/filesystem/home/pi/code/updatecli_github_commit.yml"
-        
+        UPDATECLI_CONFIG="repository/src/modules/rpi-deploy/filesystem/home/pi/code/updatecli_github_commit.yml"
+
+        # Replace template variables using envsubst
+        export GITHUB_OWNER="$OWNER"
+        export GITHUB_REPOSITORY="$REPOSITORY"
+        export GITHUB_VERSION_PREFIX="${{ inputs.version_prefix }}"
+
+        # Process the template file
+        envsubst '$GITHUB_OWNER $GITHUB_REPOSITORY' < "$UPDATECLI_CONFIG" > "$UPDATECLI_CONFIG.tmp"
+        mv "$UPDATECLI_CONFIG.tmp" "$UPDATECLI_CONFIG"
+
+        # Update the version pattern separately since it needs special handling
+        sed -i "s/v{{GITHUB_REPOSITORY}}-.*\$/v${GITHUB_VERSION_PREFIX}-.*\$/g" "$UPDATECLI_CONFIG"
+
+        # Configure esbuild if server URL is provided
+        if [ -n "${{ inputs.esbuild_server_url }}" ]; then
+          echo "ESBUILD_SERVER_URL=${{ inputs.esbuild_server_url }}" >> repository/src/modules/rpi-deploy/filesystem/home/pi/code/esbuild.env
+          echo "SERVICE_NAME=${{ inputs.service_name }}-dev" >> repository/src/modules/rpi-deploy/filesystem/home/pi/code/esbuild.env
+
+          # Enable esbuild service in start_chroot_script
+          sed -i 's/# systemctl enable check_esbuild.service/systemctl enable check_esbuild.service/' repository/src/modules/rpi-deploy/start_chroot_script
+
+          echo "Esbuild mode enabled:"
+          echo "  Server URL: ${{ inputs.esbuild_server_url }}"
+          echo "  Service name: ${{ inputs.service_name }}-dev"
+        fi
+
         echo "Updated UpdateCLI config with:"
         echo "  Owner: $OWNER"
-        echo "  Repository: $REPOSITORY"  
+        echo "  Repository: $REPOSITORY"
         echo "  Version prefix: ${{ inputs.version_prefix }}"
-        echo "  Config copied to: /home/pi/code/updatecli_github_commit.yml"
+        echo "  Service name: ${{ inputs.service_name }}"
+        if [ -n "${{ inputs.esbuild_server_url }}" ]; then
+          echo "  Esbuild mode: enabled"
+        else
+          echo "  Esbuild mode: disabled (GitHub releases only)"
+        fi
 
     - name: Download Raspbian Image
       shell: bash

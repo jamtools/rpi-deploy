@@ -3,64 +3,19 @@ name: Build Image
 on: push
 
 jobs:
-  build:
+  test-action:
     runs-on: ubuntu-latest
     steps:
-    - name: Free up disk space
-      uses: insightsengineering/disk-space-reclaimer@v1
-      with:
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: false
-        swap-storage: true
-        docker-images: true
-        tools-cache: false
+      - name: Checkout releases repo into `.github/composite-actions`
+        uses: actions/checkout@v3
+        with:
+          repository: jamtools/rpi-deploy
+          path: .github/composite-actions
+          ref: ${{ github.sha }}
 
-    - name: Check disk space
-      run: df -h
-    - name: Update apt
-      run: sudo apt-get update
-    - name: Install Dependencies
-      run: sudo apt install coreutils p7zip-full qemu-user-static python3-git
-    - name: Checkout CustomPiOS
-      uses: actions/checkout@v2
-      with:
-        repository: 'guysoft/CustomPiOS'
-        path: CustomPiOS
-    - name: Checkout Project Repository
-      uses: actions/checkout@v2
-      with:
-        repository: ${{ github.repository }}
-        path: repository_temp
-        submodules: true
-    - name: Move FullPageOS folder
-      run: |
-        mv repository_temp/FullPageOS repository
-    # - name: Setup Deno
-    #   uses: denoland/setup-deno@v2
-    #   with:
-    #     deno-version: v2.x
-    # - name: Compile IP Configurator
-    #   run: cd repository/apps/ip_configurator && deno task compile
-    # - name: Move IP Configurator Executable
-    #   run: |
-    #     cp repository/apps/ip_configurator/ip_configurator_executable repository/src/modules/fullpageos/filesystem/home/pi/apps/
-    #     chmod +x repository/src/modules/fullpageos/filesystem/home/pi/apps/ip_configurator_executable
-    - name: Download Raspbian Image
-      run: cd repository/src/image && wget -q -c --trust-server-names 'https://downloads.raspberrypi.org/raspios_lite_armhf_latest'
-    - name: Update CustomPiOS Paths
-      run: cd repository/src && ../../CustomPiOS/src/update-custompios-paths
-    - name: Build Image
-      run: sudo modprobe loop && cd repository/src && sudo BASE_ARCH=armhf bash -x ./build_dist
-    - name: Copy Output
-      run: cp ${{ github.workspace }}/repository/src/workspace/*-raspios-*-lite.img build.img
-    - name: Zip Output
-      run: gzip build.img
-    - name: Set artifact name
-      id: artifact
-      run: echo "name=$(date '+%Y%m%d_%H%M%S')_${{ github.sha }}_toucheth.img.gz" >> $GITHUB_OUTPUT
-    - uses: actions/upload-artifact@v4
-      with:
-        name: ${{ steps.artifact.outputs.name }}
-        path: build.img.gz
+      - name: Build RPi Image
+        uses: ./.github/composite-actions/.github/actions/build-rpi-image
+        with:
+          source_repo: 'jamtools/jamscribe'
+          version_prefix: 'vjamscribe-'
+          github_token: ${{ secrets.GITHUB_TOKEN }}

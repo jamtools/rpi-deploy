@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/updatecli apply --config /home/pi/code/updatecli_github_commit.yml
-EnvironmentFile=/home/pi/secrets.env
+EnvironmentFile=/home/pi/code/secrets.env
 
 [Install]
 WantedBy=multi-user.target

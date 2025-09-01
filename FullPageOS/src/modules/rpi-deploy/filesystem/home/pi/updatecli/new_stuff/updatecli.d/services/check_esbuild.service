@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/node /home/jamtools/code/scripts/check_esbuild.js
+ExecStart=/usr/bin/node /home/pi/code/scripts/check_esbuild.js
 
 [Install]
 WantedBy=multi-user.target

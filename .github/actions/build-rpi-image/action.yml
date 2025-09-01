@@ -89,10 +89,10 @@ runs:
       shell: bash
       run: |
         # Create the directory structure where updatecli expects the zip file on the RPi
-        mkdir -p repository/src/modules/rpi-deploy/filesystem/home/jamtools/code/artifacts/
+        mkdir -p repository/src/modules/rpi-deploy/filesystem/home/pi/code/artifacts/
         # Move the downloaded zip to where the updatecli scripts expect it
-        mv previous_release.zip repository/src/modules/rpi-deploy/filesystem/home/jamtools/code/artifacts/dist.zip
-        echo "Placed release zip at: repository/src/modules/rpi-deploy/filesystem/home/jamtools/code/artifacts/dist.zip"
+        mv previous_release.zip repository/src/modules/rpi-deploy/filesystem/home/pi/code/artifacts/dist.zip
+        echo "Placed release zip at: repository/src/modules/rpi-deploy/filesystem/home/pi/code/artifacts/dist.zip"
 
     - name: Download Raspbian Image
       shell: bash

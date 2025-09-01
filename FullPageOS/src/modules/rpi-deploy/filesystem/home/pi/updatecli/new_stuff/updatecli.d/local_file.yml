@@ -10,9 +10,9 @@ conditions:
     kind: shell
     sourceid: fileHash
     spec:
-      command: /home/jamtools/code/scripts/compare_with_file.sh ./.last_index_hash
+      command: /home/pi/code/scripts/compare_with_file.sh ./.last_index_hash
 targets:
   fetchBinary:
     kind: shell
     spec:
-      command: /home/jamtools/code/scripts/run_from_esbuild.sh myapp
+      command: /home/pi/code/scripts/run_from_esbuild.sh myapp

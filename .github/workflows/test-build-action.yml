@@ -1,0 +1,21 @@
+name: Test RPi Image Build Action
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/actions/build-rpi-image/**'
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build RPi Image
+        uses: ./.github/actions/build-rpi-image
+        with:
+          source_repo: 'jamtools/jamscribe'
+          version_prefix: 'vjamscribe-'
+          github_token: ${{ secrets.GITHUB_TOKEN }}

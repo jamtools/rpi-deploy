@@ -1,0 +1,125 @@
+name: 'Build RPi Image with Release Download'
+description: 'Downloads latest release from a repo and builds a Raspberry Pi image'
+inputs:
+  source_repo:
+    description: 'GitHub repository to download release from (e.g., jamtools/jamscribe)'
+    required: true
+  version_prefix:
+    description: 'Version tag prefix to match releases (e.g., vjamscribe-)'
+    required: true
+  github_token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Find latest matching release by tag prefix
+      id: find_release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        PREFIX="${{ inputs.version_prefix }}"
+        latest=$(gh release list --repo "${{ inputs.source_repo }}" --limit 100 --json tagName,publishedAt \
+          | jq -r --arg prefix "$PREFIX" '
+              map(select(.tagName | startswith($prefix)))
+              | sort_by(.publishedAt)
+              | last
+              | if . == null then "none" else .tagName end
+            ')
+        echo "latest_tag=$latest" >> $GITHUB_OUTPUT
+        echo "Found latest release: $latest"
+
+    - name: Download artifact from latest release
+      if: steps.find_release.outputs.latest_tag != 'none'
+      uses: blauqs/actions-download-asset@master
+      with:
+        repo: ${{ inputs.source_repo }}
+        version: ${{ steps.find_release.outputs.latest_tag }}
+        file: dist.zip
+        out: previous_release.zip
+        token: ${{ inputs.github_token }}
+
+    - name: Free up disk space
+      uses: insightsengineering/disk-space-reclaimer@v1
+      with:
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false
+        swap-storage: true
+        docker-images: true
+        tools-cache: false
+
+    - name: Check disk space
+      shell: bash
+      run: df -h
+
+    - name: Update apt
+      shell: bash
+      run: sudo apt-get update
+
+    - name: Install Dependencies
+      shell: bash
+      run: sudo apt install coreutils p7zip-full qemu-user-static python3-git
+
+    - name: Checkout CustomPiOS
+      uses: actions/checkout@v2
+      with:
+        repository: 'guysoft/CustomPiOS'
+        path: CustomPiOS
+
+    - name: Checkout Project Repository
+      uses: actions/checkout@v2
+      with:
+        repository: ${{ github.repository }}
+        path: repository_temp
+        submodules: true
+
+    - name: Move FullPageOS folder
+      shell: bash
+      run: |
+        mv repository_temp/FullPageOS repository
+
+    - name: Place downloaded release zip
+      if: steps.find_release.outputs.latest_tag != 'none'
+      shell: bash
+      run: |
+        # Create the directory structure where updatecli expects the zip file on the RPi
+        mkdir -p repository/src/modules/rpi-deploy/filesystem/home/jamtools/code/artifacts/
+        # Move the downloaded zip to where the updatecli scripts expect it
+        mv previous_release.zip repository/src/modules/rpi-deploy/filesystem/home/jamtools/code/artifacts/dist.zip
+        echo "Placed release zip at: repository/src/modules/rpi-deploy/filesystem/home/jamtools/code/artifacts/dist.zip"
+
+    - name: Download Raspbian Image
+      shell: bash
+      run: cd repository/src/image && wget -q -c --trust-server-names 'https://downloads.raspberrypi.org/raspios_lite_armhf_latest'
+
+    - name: Update CustomPiOS Paths
+      shell: bash
+      run: cd repository/src && ../../CustomPiOS/src/update-custompios-paths
+
+    - name: Build Image
+      shell: bash
+      run: sudo modprobe loop && cd repository/src && sudo BASE_ARCH=armhf bash -x ./build_dist
+
+    - name: Copy Output
+      shell: bash
+      run: cp ${{ github.workspace }}/repository/src/workspace/*-raspios-*-lite.img build.img
+
+    - name: Zip Output
+      shell: bash
+      run: gzip build.img
+
+    - name: Set artifact name
+      id: artifact
+      shell: bash
+      run: echo "name=$(date '+%Y%m%d_%H%M%S')_${{ github.sha }}_${{ inputs.version_prefix }}rpi.img.gz" >> $GITHUB_OUTPUT
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.artifact.outputs.name }}
+        path: build.img.gz

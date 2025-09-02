@@ -9,7 +9,7 @@ set -e
 
 source /common.sh
 
-unpack /filesystem/home /home
+unpack /filesystem/home /home pi
 # unpack /filesystem/opt /opt
 # unpack /filesystem/boot /"${BASE_BOOT_MOUNT_PATH}"
 unpack /filesystem/root_init /

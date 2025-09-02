@@ -19,7 +19,7 @@ apt-get update
 sudo apt install -y cockpit
 sudo apt install -y npm
 
-curl -sL -o /tmp/updatecli_arm64.deb https://github.com/updatecli/updatecli/releases/download/v0.97.0/updatecli_arm64.deb && \
+curl -sL -o /tmp/updatecli_arm64.deb https://github.com/updatecli/updatecli/releases/download/v0.97.0/updatecli_armv6.deb && \
     sudo dpkg -i /tmp/updatecli_arm64.deb && \
     rm /tmp/updatecli_arm64.deb
 

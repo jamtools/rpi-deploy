@@ -26,7 +26,7 @@ curl -sL -o /tmp/updatecli_arm64.deb https://github.com/updatecli/updatecli/rele
 # Install Node.js dependencies in the correct directory
 cd /home/pi/code
 npm init -y
-npm i eventsource
+npm i eventsource better_sqlite3 easymidi
 cd /
 
 # Make scripts executable

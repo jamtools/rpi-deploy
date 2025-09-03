@@ -6,8 +6,6 @@
         "access-control-allow-origin": "*",
         "access-control-expose-headers": "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, Deprecation, Sunset",
         "cache-control": "public, max-age=60, s-maxage=60",
-        "content-encoding": "gzip",
-        "content-length": "570",
         "content-security-policy": "default-src 'none'",
         "content-type": "application/json; charset=utf-8",
         "date": "Mon, 27 May 2024 19:28:47 GMT",

@@ -1,0 +1,25 @@
+name: Build Image
+
+on: push
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout releases repo into `.github/composite-actions`
+        uses: actions/checkout@v3
+        with:
+          repository: jamtools/rpi-deploy
+          path: .github/composite-actions
+          ref: ${{ github.sha }}
+
+      - name: Build RPi Image
+        uses: ./.github/composite-actions/.github/actions/build-rpi-image
+        with:
+          source_repo: 'jamtools/jamscribe'
+          version_prefix: 'vjamscribe-'
+          gh_releases_token: ${{ secrets.GH_RELEASES_TOKEN }}
+          service_name: 'jamscribe'
+          service_command: '/usr/bin/node /home/pi/code/artifacts/dist/server/dist/local-server.cjs'
+          chroot_commands: |
+            npm i better-sqlite3 easymidi

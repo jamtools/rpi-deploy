@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# FullPageOS generation script
+# Helper script that runs in a Raspbian/others chroot to create the FullPageOS distro
+# Written by Guy Sheffer <guysoft at gmail dot com>
+# GPL V3
+########
+set -x
+set -e
+
+source /common.sh
+
+unpack /filesystem/home /home pi
+# unpack /filesystem/opt /opt
+# unpack /filesystem/boot /"${BASE_BOOT_MOUNT_PATH}"
+unpack /filesystem/root_init /
+
+apt-get update
+
+sudo apt install -y cockpit
+
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+
+curl -sL -o /tmp/updatecli_arm64.deb https://github.com/updatecli/updatecli/releases/download/v0.97.0/updatecli_armv6.deb && \
+    sudo dpkg -i /tmp/updatecli_arm64.deb && \
+    rm /tmp/updatecli_arm64.deb
+
+# Install Node.js dependencies in the correct directory
+cd /home/pi/code
+npm init -y
+npm i eventsource
+${CHROOT_COMMANDS}
+cd /
+
+# Make scripts executable
+chmod +x /home/pi/code/scripts/*.sh
+chmod +x /home/pi/code/scripts/common/*.sh
+
+# Enable systemd services
+systemctl daemon-reload
+systemctl enable check_github_releases.timer
+systemctl enable check_github_releases.service
+
+echo "server time.nist.gov" >> /etc/ntp.conf
+echo "server ntp.ubuntu.com" >> /etc/ntp.conf
+
+# Optional: Enable esbuild service for local development
+# Uncomment the following line if you want to use local esbuild server instead of GitHub releases
+# systemctl enable check_esbuild.service
+
+#cleanup
+apt-get clean
+apt-get autoremove -y

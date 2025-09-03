@@ -18,6 +18,14 @@ inputs:
   esbuild_server_url:
     description: 'URL of esbuild development server (enables esbuild mode when provided)'
     required: false
+  chroot_commands:
+    description: 'Additional commands to run in chroot environment (multiline string)'
+    required: false
+    default: ''
+  service_command:
+    description: 'Command to run for the service (e.g., "/usr/bin/node /home/pi/code/artifacts/dist/server/dist/local-server.cjs")'
+    required: false
+    default: '/usr/bin/node /home/pi/code/artifacts/dist/server/dist/local-server.cjs'
 
 runs:
   using: 'composite'
@@ -122,13 +130,25 @@ runs:
         export GITHUB_OWNER="$OWNER"
         export GITHUB_REPOSITORY="$REPOSITORY"
         export GITHUB_VERSION_PREFIX="${{ inputs.version_prefix }}"
+        export GITHUB_TAG_PREFIX="${GITHUB_VERSION_PREFIX}"
 
         # Process the template file
-        envsubst '$GITHUB_OWNER $GITHUB_REPOSITORY' < "$UPDATECLI_CONFIG" > "$UPDATECLI_CONFIG.tmp"
+        envsubst '$GITHUB_OWNER $GITHUB_REPOSITORY $GITHUB_TAG_PREFIX' < "$UPDATECLI_CONFIG" > "$UPDATECLI_CONFIG.tmp"
         mv "$UPDATECLI_CONFIG.tmp" "$UPDATECLI_CONFIG"
 
-        # Update the version pattern separately since it needs special handling
-        sed -i "s/v{{GITHUB_REPOSITORY}}-.*\$/v${GITHUB_VERSION_PREFIX}-.*\$/g" "$UPDATECLI_CONFIG"
+        # Export additional template variables
+        export CHROOT_COMMANDS="${{ inputs.chroot_commands }}"
+        export SERVICE_COMMAND="${{ inputs.service_command }}"
+
+        # Process start_chroot_script template
+        CHROOT_SCRIPT="repository/src/modules/rpi-deploy/start_chroot_script"
+        envsubst '$CHROOT_COMMANDS' < "$CHROOT_SCRIPT" > "$CHROOT_SCRIPT.tmp"
+        mv "$CHROOT_SCRIPT.tmp" "$CHROOT_SCRIPT"
+
+        # Process run_from_github_release.sh template
+        RELEASE_SCRIPT="repository/src/modules/rpi-deploy/filesystem/home/pi/code/scripts/run_from_github_release.sh"
+        envsubst '$SERVICE_COMMAND' < "$RELEASE_SCRIPT" > "$RELEASE_SCRIPT.tmp"
+        mv "$RELEASE_SCRIPT.tmp" "$RELEASE_SCRIPT"
 
         # Configure esbuild if server URL is provided
         if [ -n "${{ inputs.esbuild_server_url }}" ]; then

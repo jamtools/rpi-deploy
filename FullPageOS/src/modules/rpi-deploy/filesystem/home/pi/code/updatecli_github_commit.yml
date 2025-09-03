@@ -9,7 +9,7 @@ sources:
       token: "{{ requiredEnv `GITHUB_TOKEN` }}"
       versionfilter:
         kind: regex
-        pattern: "v{{GITHUB_REPOSITORY}}-.*$"
+        pattern: "{{GITHUB_TAG_PREFIX}}.*$"
 
 conditions:
   checkIfCommitIsNew:

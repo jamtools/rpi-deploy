@@ -17,7 +17,9 @@ unpack /filesystem/root_init /
 apt-get update
 
 sudo apt install -y cockpit
-sudo apt install -y npm
+
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
 
 curl -sL -o /tmp/updatecli_arm64.deb https://github.com/updatecli/updatecli/releases/download/v0.97.0/updatecli_armv6.deb && \
     sudo dpkg -i /tmp/updatecli_arm64.deb && \

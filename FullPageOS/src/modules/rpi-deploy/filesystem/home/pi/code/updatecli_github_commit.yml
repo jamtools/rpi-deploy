@@ -4,12 +4,12 @@ sources:
     kind: githubrelease
     # name: github version
     spec:
-      owner: {{GITHUB_OWNER}}
-      repository: {{GITHUB_REPOSITORY}}
-      token: "{{ requiredEnv `GITHUB_TOKEN` }}"
+      owner: ${GITHUB_OWNER}
+      repository: ${GITHUB_REPOSITORY}
+      token: "{{ requiredEnv `GITHUB_RELEASES_TOKEN` }}"
       versionfilter:
         kind: regex
-        pattern: "{{GITHUB_TAG_PREFIX}}.*$"
+        pattern: "${GITHUB_TAG_PREFIX}.*$"
 
 conditions:
   checkIfCommitIsNew:
@@ -23,4 +23,4 @@ targets:
     kind: shell
     sourceid: newRelease
     spec:
-      command: /home/pi/code/scripts/run_from_github_release.sh {{GITHUB_OWNER}} {{GITHUB_REPOSITORY}}
+      command: /home/pi/code/scripts/run_from_github_release.sh ${GITHUB_OWNER} ${GITHUB_REPOSITORY}

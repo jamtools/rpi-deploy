@@ -18,7 +18,7 @@ jobs:
         with:
           source_repo: 'jamtools/jamscribe'
           version_prefix: 'vjamscribe-'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_releases_token: ${{ secrets.GITHUB_RELEASES_TOKEN }}
           service_name: 'jamscribe'
           service_command: '/usr/bin/node /home/pi/code/artifacts/dist/server/dist/local-server.cjs'
           chroot_commands: |

@@ -6,7 +6,7 @@ sources:
     spec:
       owner: ${GITHUB_OWNER}
       repository: ${GITHUB_REPOSITORY}
-      token: "{{ requiredEnv `GITHUB_RELEASES_TOKEN` }}"
+      token: "{{ requiredEnv `GH_RELEASES_TOKEN` }}"
       versionfilter:
         kind: regex
         pattern: "${GITHUB_TAG_PREFIX}.*$"

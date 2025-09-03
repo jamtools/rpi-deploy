@@ -7,7 +7,7 @@ inputs:
   version_prefix:
     description: 'Version tag prefix to match releases (e.g., vapp-)'
     required: true
-  github_releases_token:
+  gh_releases_token:
     description: 'GitHub token for API access'
     required: true
     default: ${{ github.token }}
@@ -58,7 +58,7 @@ runs:
       id: find_release
       shell: bash
       env:
-        GH_TOKEN: ${{ inputs.github_releases_token }}
+        GH_TOKEN: ${{ inputs.gh_releases_token }}
       run: |
         PREFIX="${{ inputs.version_prefix }}"
         latest=$(gh release list --repo "${{ inputs.source_repo }}" --limit 100 --json tagName,publishedAt \
@@ -79,7 +79,7 @@ runs:
         version: ${{ steps.find_release.outputs.latest_tag }}
         file: dist.zip
         out: previous_release.zip
-        token: ${{ inputs.github_releases_token }}
+        token: ${{ inputs.gh_releases_token }}
 
     - name: Checkout CustomPiOS
       uses: actions/checkout@v2
@@ -119,8 +119,8 @@ runs:
         # Create the directory for secrets
         mkdir -p repository/src/modules/rpi-deploy/filesystem/home/pi/code/
 
-        # Create secrets.env file with GITHUB_RELEASES_TOKEN and SERVICE_NAME
-        echo "GITHUB_RELEASES_TOKEN=${{ inputs.github_releases_token }}" > repository/src/modules/rpi-deploy/filesystem/home/pi/code/secrets.env
+        # Create secrets.env file with GH_RELEASES_TOKEN and SERVICE_NAME
+        echo "GH_RELEASES_TOKEN=${{ inputs.gh_releases_token }}" > repository/src/modules/rpi-deploy/filesystem/home/pi/code/secrets.env
         echo "SERVICE_NAME=${{ inputs.service_name }}" >> repository/src/modules/rpi-deploy/filesystem/home/pi/code/secrets.env
 
         # Parameterize the updatecli configuration file

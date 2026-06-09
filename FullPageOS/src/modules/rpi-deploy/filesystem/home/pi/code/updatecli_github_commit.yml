@@ -1,0 +1,26 @@
+name: Pull latest release on GitHub
+sources:
+  newRelease:
+    kind: githubrelease
+    # name: github version
+    spec:
+      owner: ${GITHUB_OWNER}
+      repository: ${GITHUB_REPOSITORY}
+      token: "{{ requiredEnv `GH_RELEASES_TOKEN` }}"
+      versionfilter:
+        kind: regex
+        pattern: "${GITHUB_TAG_PREFIX}.*$"
+
+conditions:
+  checkIfCommitIsNew:
+    kind: shell
+    sourceid: newRelease
+    spec:
+      command: /home/pi/code/scripts/compare_with_file.sh /home/pi/code/.last_release_tag
+
+targets:
+  runFromRelease:
+    kind: shell
+    sourceid: newRelease
+    spec:
+      command: /home/pi/code/scripts/run_from_github_release.sh ${GITHUB_OWNER} ${GITHUB_REPOSITORY}
